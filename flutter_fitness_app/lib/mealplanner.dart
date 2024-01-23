@@ -41,13 +41,12 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Meal Planner"),
-        backgroundColor: Colors.green, // Adjust the color as needed
+        backgroundColor: Colors.green,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
               children: [
@@ -75,7 +74,10 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
             SizedBox(height: 10.0),
             ElevatedButton(
               onPressed: _addMeal,
-              child: Text("Add Meal"),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green,
+              ),
+              child: Text("Add Meal", style: TextStyle(color: Colors.white)),
             ),
             SizedBox(height: 20.0),
             Expanded(
@@ -85,36 +87,50 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
                   String day = mealsByDay.keys.elementAt(dayIndex);
                   List<String> dayMeals = mealsByDay[day]!;
 
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  return Card(
+                    elevation: 3.0,
+                    margin: EdgeInsets.symmetric(vertical: 10.0),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "$day:",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "$day:",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18.0,
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () => _removeDay(day),
+                              ),
+                            ],
                           ),
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () => _removeDay(day),
+                          SizedBox(height: 10.0),
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: dayMeals.length,
+                            itemBuilder: (context, mealIndex) {
+                              return ListTile(
+                                title: Text(
+                                  dayMeals[mealIndex],
+                                  style: TextStyle(fontSize: 16.0),
+                                ),
+                                trailing: IconButton(
+                                  icon: Icon(Icons.delete),
+                                  onPressed: () => _removeMeal(day, mealIndex),
+                                ),
+                              );
+                            },
                           ),
                         ],
                       ),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: dayMeals.length,
-                        itemBuilder: (context, mealIndex) {
-                          return ListTile(
-                            title: Text(dayMeals[mealIndex]),
-                            trailing: IconButton(
-                              icon: Icon(Icons.delete),
-                              onPressed: () => _removeMeal(day, mealIndex),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
+                    ),
                   );
                 },
               ),
