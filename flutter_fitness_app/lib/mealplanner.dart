@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MealPlannerPage extends StatefulWidget {
   @override
@@ -10,6 +12,41 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
   TextEditingController _mealController = TextEditingController();
   TextEditingController _dayController = TextEditingController();
 
+  final String _key = 'meal_planner_data';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String storedData = prefs.getString(_key) ?? '{}';
+
+      setState(() {
+        mealsByDay = (json.decode(storedData) as Map<String, dynamic>).map(
+          (key, value) => MapEntry(
+            key,
+            (value as List<dynamic>).cast<String>(),
+          ),
+        );
+      });
+    } catch (e) {
+      print("Error loading data: $e");
+    }
+  }
+
+  void _saveData() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString(_key, json.encode(mealsByDay));
+    } catch (e) {
+      print("Error saving data: $e");
+    }
+  }
+
   void _addMeal() {
     String day = _dayController.text.trim();
     String newMeal = _mealController.text.trim();
@@ -20,6 +57,7 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
         mealsByDay[day]!.add(newMeal);
         _mealController.clear();
         _dayController.clear();
+        _saveData();
       });
     }
   }
@@ -27,12 +65,14 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
   void _removeMeal(String day, int index) {
     setState(() {
       mealsByDay[day]!.removeAt(index);
+      _saveData();
     });
   }
 
   void _removeDay(String day) {
     setState(() {
       mealsByDay.remove(day);
+      _saveData();
     });
   }
 

@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WorkoutPlannerPage extends StatefulWidget {
   @override
@@ -10,6 +12,47 @@ class _WorkoutPlannerPageState extends State<WorkoutPlannerPage> {
   TextEditingController _workoutController = TextEditingController();
   TextEditingController _repsDurationController = TextEditingController();
   TextEditingController _dayController = TextEditingController();
+
+  final String _key = 'workout_planner_data';
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  void _loadData() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String storedData = prefs.getString(_key) ?? '{}';
+
+      setState(() {
+        workoutsByDay = (json.decode(storedData) as Map<String, dynamic>).map(
+          (key, value) {
+            List<Map<String, String>> workouts = [];
+            if (value is List<dynamic>) {
+              workouts = value
+                  .whereType<Map<String, dynamic>>()
+                  .map((item) => item.cast<String, String>())
+                  .toList();
+            }
+            return MapEntry(key, workouts);
+          },
+        );
+      });
+    } catch (e) {
+      print("Error loading data: $e");
+    }
+  }
+
+  void _saveData() async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString(_key, json.encode(workoutsByDay));
+    } catch (e) {
+      print("Error saving data: $e");
+    }
+  }
 
   void _addWorkout() {
     String day = _dayController.text.trim();
@@ -26,6 +69,7 @@ class _WorkoutPlannerPageState extends State<WorkoutPlannerPage> {
         _workoutController.clear();
         _repsDurationController.clear();
         _dayController.clear();
+        _saveData();
       });
     }
   }
@@ -33,12 +77,14 @@ class _WorkoutPlannerPageState extends State<WorkoutPlannerPage> {
   void _removeWorkout(String day, int index) {
     setState(() {
       workoutsByDay[day]!.removeAt(index);
+      _saveData();
     });
   }
 
   void _removeDay(String day) {
     setState(() {
       workoutsByDay.remove(day);
+      _saveData();
     });
   }
 
@@ -47,7 +93,7 @@ class _WorkoutPlannerPageState extends State<WorkoutPlannerPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Workout Planner"),
-        backgroundColor: Colors.blue, // Adjust the color as needed
+        backgroundColor: Colors.blue,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -91,7 +137,7 @@ class _WorkoutPlannerPageState extends State<WorkoutPlannerPage> {
             ElevatedButton(
               onPressed: _addWorkout,
               style: ElevatedButton.styleFrom(
-                primary: Colors.blue, // Button color
+                primary: Colors.blue,
               ),
               child: Text("Add Workout", style: TextStyle(color: Colors.white)),
             ),
