@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'theme_provider.dart'; // Import the theme_provider.dart file
 import 'home.dart'; //Import the home file
 
 void main() {
-  runApp(FitnessApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: FitnessApp(),
+    ),
+  );
 }
 
 class FitnessApp extends StatelessWidget {

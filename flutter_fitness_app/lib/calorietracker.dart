@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'theme_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CalorieTrackerPage extends StatefulWidget {
@@ -55,80 +57,95 @@ class _CalorieTrackerPageState extends State<CalorieTrackerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Calorie Tracker"),
-        backgroundColor: Colors.blue,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              "Total Calories Consumed",
-              style: TextStyle(
-                fontSize: 24.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 10.0),
-            Text(
-              "$_totalConsumedCalories Calories",
-              style: TextStyle(
-                fontSize: 32.0,
-                color: Colors.blue,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 20.0),
-            TextField(
-              controller: _consumedController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: "Enter Calories Consumed",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: _addCalories,
-              style: ElevatedButton.styleFrom(
-                primary: Colors.blue,
-                onPrimary: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 20.0),
-              ),
-              child: Text("Add Calories"),
-            ),
-            SizedBox(height: 20.0),
-            Text(
-              "Enter Calories Burnt",
-              style: TextStyle(
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 10.0),
-            TextField(
-              controller: _burntController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: "Enter Calories Burnt",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            SizedBox(height: 20.0),
-            ElevatedButton(
-              onPressed: _removeCalories,
-              style: ElevatedButton.styleFrom(
-                primary: Colors.red, // Use red for removal
-                onPrimary: Colors.white,
-                padding: EdgeInsets.symmetric(horizontal: 20.0),
-              ),
-              child: Text("Remove Calories"),
+    ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
+
+    return MaterialApp(
+      themeMode: themeProvider.themeMode,
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text("Calorie Tracker"),
+          backgroundColor: Colors.blue,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.lightbulb),
+              onPressed: () {
+                themeProvider.toggleTheme();
+              },
             ),
           ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(
+                "Total Calories Consumed",
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 10.0),
+              Text(
+                "$_totalConsumedCalories Calories",
+                style: TextStyle(
+                  fontSize: 32.0,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 20.0),
+              TextField(
+                controller: _consumedController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: "Enter Calories Consumed",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: _addCalories,
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.blue,
+                  onPrimary: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                ),
+                child: Text("Add Calories"),
+              ),
+              SizedBox(height: 20.0),
+              Text(
+                "Enter Calories Burnt",
+                style: TextStyle(
+                  fontSize: 20.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 10.0),
+              TextField(
+                controller: _burntController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: "Enter Calories Burnt",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 20.0),
+              ElevatedButton(
+                onPressed: _removeCalories,
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.red, // Use red for removal
+                  onPrimary: Colors.white,
+                  padding: EdgeInsets.symmetric(horizontal: 20.0),
+                ),
+                child: Text("Remove Calories"),
+              ),
+            ],
+          ),
         ),
       ),
     );
