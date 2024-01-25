@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'theme_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MealPlannerPage extends StatefulWidget {
@@ -78,104 +80,120 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Meal Planner"),
-        backgroundColor: Colors.green,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _dayController,
-                    decoration: InputDecoration(
-                      labelText: "Enter Day",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 10.0),
-                Expanded(
-                  child: TextField(
-                    controller: _mealController,
-                    decoration: InputDecoration(
-                      labelText: "Enter Meal",
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10.0),
-            ElevatedButton(
-              onPressed: _addMeal,
-              style: ElevatedButton.styleFrom(
-                primary: Colors.green,
-              ),
-              child: Text("Add Meal", style: TextStyle(color: Colors.white)),
-            ),
-            SizedBox(height: 20.0),
-            Expanded(
-              child: ListView.builder(
-                itemCount: mealsByDay.length,
-                itemBuilder: (context, dayIndex) {
-                  String day = mealsByDay.keys.elementAt(dayIndex);
-                  List<String> dayMeals = mealsByDay[day]!;
+    ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
 
-                  return Card(
-                    elevation: 3.0,
-                    margin: EdgeInsets.symmetric(vertical: 10.0),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "$day:",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18.0,
-                                ),
-                              ),
-                              IconButton(
-                                icon: Icon(Icons.delete),
-                                onPressed: () => _removeDay(day),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 10.0),
-                          ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: dayMeals.length,
-                            itemBuilder: (context, mealIndex) {
-                              return ListTile(
-                                title: Text(
-                                  dayMeals[mealIndex],
-                                  style: TextStyle(fontSize: 16.0),
-                                ),
-                                trailing: IconButton(
-                                  icon: Icon(Icons.delete),
-                                  onPressed: () => _removeMeal(day, mealIndex),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
+    return MaterialApp(
+      themeMode: themeProvider.themeMode,
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text("Meal Planner"),
+          backgroundColor: Colors.green,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.lightbulb),
+              onPressed: () {
+                themeProvider.toggleTheme();
+              },
             ),
           ],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _dayController,
+                      decoration: InputDecoration(
+                        labelText: "Enter Day",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10.0),
+                  Expanded(
+                    child: TextField(
+                      controller: _mealController,
+                      decoration: InputDecoration(
+                        labelText: "Enter Meal",
+                        border: OutlineInputBorder(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10.0),
+              ElevatedButton(
+                onPressed: _addMeal,
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.green,
+                ),
+                child: Text("Add Meal", style: TextStyle(color: Colors.white)),
+              ),
+              SizedBox(height: 20.0),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: mealsByDay.length,
+                  itemBuilder: (context, dayIndex) {
+                    String day = mealsByDay.keys.elementAt(dayIndex);
+                    List<String> dayMeals = mealsByDay[day]!;
+
+                    return Card(
+                      elevation: 3.0,
+                      margin: EdgeInsets.symmetric(vertical: 10.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "$day:",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18.0,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete),
+                                  onPressed: () => _removeDay(day),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 10.0),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: dayMeals.length,
+                              itemBuilder: (context, mealIndex) {
+                                return ListTile(
+                                  title: Text(
+                                    dayMeals[mealIndex],
+                                    style: TextStyle(fontSize: 16.0),
+                                  ),
+                                  trailing: IconButton(
+                                    icon: Icon(Icons.delete),
+                                    onPressed: () =>
+                                        _removeMeal(day, mealIndex),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
