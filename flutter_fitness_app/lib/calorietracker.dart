@@ -9,9 +9,8 @@ class CalorieTrackerPage extends StatefulWidget {
 }
 
 class _CalorieTrackerPageState extends State<CalorieTrackerPage> {
-  TextEditingController _consumedController = TextEditingController();
-  TextEditingController _burntController = TextEditingController();
   int _totalConsumedCalories = 0;
+  String _currentInput = '';
 
   @override
   void initState() {
@@ -31,25 +30,37 @@ class _CalorieTrackerPageState extends State<CalorieTrackerPage> {
     prefs.setInt('totalCalories', _totalConsumedCalories);
   }
 
-  void _addCalories() {
-    if (_consumedController.text.isNotEmpty) {
-      int calories = int.tryParse(_consumedController.text) ?? 0;
+  void _updateInput(String value) {
+    setState(() {
+      _currentInput += value;
+    });
+  }
+
+  void _clearInput() {
+    setState(() {
+      _currentInput = '';
+    });
+  }
+
+  void _addInputToTotal() {
+    if (_currentInput.isNotEmpty) {
+      int calories = int.tryParse(_currentInput) ?? 0;
       setState(() {
         _totalConsumedCalories += calories;
-        _consumedController.clear();
+        _currentInput = '';
       });
       _saveTotalCalories();
     }
   }
 
-  void _removeCalories() {
-    if (_burntController.text.isNotEmpty) {
-      int calories = int.tryParse(_burntController.text) ?? 0;
+  void _removeInputFromTotal() {
+    if (_currentInput.isNotEmpty) {
+      int calories = int.tryParse(_currentInput) ?? 0;
       setState(() {
         _totalConsumedCalories = (_totalConsumedCalories - calories)
             .clamp(0, double.infinity)
             .toInt();
-        _burntController.clear();
+        _currentInput = '';
       });
       _saveTotalCalories();
     }
@@ -99,55 +110,85 @@ class _CalorieTrackerPageState extends State<CalorieTrackerPage> {
                 ),
               ),
               SizedBox(height: 20.0),
-              TextField(
-                controller: _consumedController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Enter Calories Consumed",
-                  border: OutlineInputBorder(),
+              Container(
+                height: 50.0,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.black),
+                ),
+                child: Text(
+                  _currentInput,
+                  style: TextStyle(
+                    fontSize: 24.0,
+                  ),
                 ),
               ),
               SizedBox(height: 20.0),
-              ElevatedButton(
-                onPressed: _addCalories,
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.blue,
-                  onPrimary: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                ),
-                child: Text("Add Calories"),
-              ),
-              SizedBox(height: 20.0),
-              Text(
-                "Enter Calories Burnt",
-                style: TextStyle(
-                  fontSize: 20.0,
-                  fontWeight: FontWeight.bold,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNumberButton('1'),
+                  _buildNumberButton('2'),
+                  _buildNumberButton('3'),
+                ],
               ),
               SizedBox(height: 10.0),
-              TextField(
-                controller: _burntController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Enter Calories Burnt",
-                  border: OutlineInputBorder(),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNumberButton('4'),
+                  _buildNumberButton('5'),
+                  _buildNumberButton('6'),
+                ],
               ),
-              SizedBox(height: 20.0),
-              ElevatedButton(
-                onPressed: _removeCalories,
-                style: ElevatedButton.styleFrom(
-                  primary: Colors.red, // Use red for removal
-                  onPrimary: Colors.white,
-                  padding: EdgeInsets.symmetric(horizontal: 20.0),
-                ),
-                child: Text("Remove Calories"),
+              SizedBox(height: 10.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildNumberButton('7'),
+                  _buildNumberButton('8'),
+                  _buildNumberButton('9'),
+                ],
+              ),
+              SizedBox(height: 10.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => _updateInput('+'),
+                    child: Text('+'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _addInputToTotal(),
+                    child: Text('Add'),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                    onPressed: () => _updateInput('-'),
+                    child: Text('-'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _removeInputFromTotal(),
+                    child: Text('Remove'),
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildNumberButton(String value) {
+    return ElevatedButton(
+      onPressed: () => _updateInput(value),
+      child: Text(value),
     );
   }
 }
