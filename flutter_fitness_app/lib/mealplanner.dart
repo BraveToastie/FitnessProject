@@ -11,7 +11,10 @@ class MealPlannerPage extends StatefulWidget {
 
 class _MealPlannerPageState extends State<MealPlannerPage> {
   Map<String, List<String>> mealsByDay = {};
-  TextEditingController _mealController = TextEditingController();
+  String? _selectedDay;
+  String? _selectedMeal;
+  String? _customMeal;
+  TextEditingController _customMealController = TextEditingController();
   TextEditingController _dayController = TextEditingController();
 
   final String _key = 'meal_planner_data';
@@ -50,15 +53,15 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
   }
 
   void _addMeal() {
-    String day = _dayController.text.trim();
-    String newMeal = _mealController.text.trim();
-
-    if (day.isNotEmpty && newMeal.isNotEmpty) {
+    if (_selectedDay != null &&
+        (_selectedMeal != null || _customMeal != null)) {
       setState(() {
-        mealsByDay[day] ??= [];
-        mealsByDay[day]!.add(newMeal);
-        _mealController.clear();
-        _dayController.clear();
+        mealsByDay[_selectedDay!] ??= [];
+        if (_customMeal != null) {
+          mealsByDay[_selectedDay!]!.add(_selectedMeal! + ' - "$_customMeal"');
+        } else {
+          mealsByDay[_selectedDay!]!.add(_selectedMeal!);
+        }
         _saveData();
       });
     }
@@ -81,6 +84,23 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
   @override
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
+
+    List<String> daysOfTheWeek = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+
+    List<String> mealOptions = [
+      'Breakfast',
+      'Lunch',
+      'Dinner',
+      'Snack',
+    ];
 
     return MaterialApp(
       themeMode: themeProvider.themeMode,
@@ -107,20 +127,57 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
               Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      controller: _dayController,
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedDay,
                       decoration: InputDecoration(
-                        labelText: "Enter Day",
+                        labelText: 'Select Day',
                         border: OutlineInputBorder(),
                       ),
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedDay = newValue;
+                        });
+                      },
+                      items: daysOfTheWeek.map((day) {
+                        return DropdownMenuItem<String>(
+                          value: day,
+                          child: Text(day),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  SizedBox(width: 10.0),
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedMeal,
+                      decoration: InputDecoration(
+                        labelText: 'Select Meal',
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedMeal = newValue;
+                        });
+                      },
+                      items: mealOptions.map((meal) {
+                        return DropdownMenuItem<String>(
+                          value: meal,
+                          child: Text(meal),
+                        );
+                      }).toList(),
                     ),
                   ),
                   SizedBox(width: 10.0),
                   Expanded(
                     child: TextField(
-                      controller: _mealController,
+                      controller: _customMealController,
+                      onChanged: (value) {
+                        setState(() {
+                          _customMeal = value.isNotEmpty ? value : null;
+                        });
+                      },
                       decoration: InputDecoration(
-                        labelText: "Enter Meal",
+                        labelText: 'Meal',
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -151,39 +208,39 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  "$day:",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18.0,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.delete),
-                                  onPressed: () => _removeDay(day),
-                                ),
-                              ],
+                            Text(
+                              day,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                              ),
                             ),
                             SizedBox(height: 10.0),
-                            ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: dayMeals.length,
-                              itemBuilder: (context, mealIndex) {
-                                return ListTile(
-                                  title: Text(
-                                    dayMeals[mealIndex],
-                                    style: TextStyle(fontSize: 16.0),
-                                  ),
-                                  trailing: IconButton(
-                                    icon: Icon(Icons.delete),
-                                    onPressed: () =>
-                                        _removeMeal(day, mealIndex),
-                                  ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: dayMeals.asMap().entries.map((entry) {
+                                int index = entry.key;
+                                String meal = entry.value;
+                                return Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      '      ${index + 1}. $meal',
+                                      style: TextStyle(fontSize: 16.0),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(Icons.delete),
+                                      onPressed: () => _removeMeal(day, index),
+                                    ),
+                                  ],
                                 );
-                              },
+                              }).toList(),
+                            ),
+                            SizedBox(height: 10.0),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () => _removeDay(day),
                             ),
                           ],
                         ),
