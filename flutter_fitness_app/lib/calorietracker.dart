@@ -154,23 +154,10 @@ class _CalorieTrackerPageState extends State<CalorieTrackerPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  ElevatedButton(
-                    onPressed: () => _updateInput('+'),
-                    child: Text('+'),
-                  ),
+                  _buildNumberButton('0'),
                   ElevatedButton(
                     onPressed: () => _addInputToTotal(),
                     child: Text('Add'),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10.0),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  ElevatedButton(
-                    onPressed: () => _updateInput('-'),
-                    child: Text('-'),
                   ),
                   ElevatedButton(
                     onPressed: () => _removeInputFromTotal(),
