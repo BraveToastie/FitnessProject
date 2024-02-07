@@ -11,9 +11,9 @@ class WorkoutPlannerPage extends StatefulWidget {
 
 class _WorkoutPlannerPageState extends State<WorkoutPlannerPage> {
   Map<String, List<Map<String, String>>> workoutsByDay = {};
+  String? _selectedDay;
   TextEditingController _workoutController = TextEditingController();
   TextEditingController _repsDurationController = TextEditingController();
-  TextEditingController _dayController = TextEditingController();
 
   final String _key = 'workout_planner_data';
 
@@ -57,22 +57,22 @@ class _WorkoutPlannerPageState extends State<WorkoutPlannerPage> {
   }
 
   void _addWorkout() {
-    String day = _dayController.text.trim();
-    String newWorkout = _workoutController.text.trim();
-    String repsDuration = _repsDurationController.text.trim();
+    if (_selectedDay != null) {
+      String newWorkout = _workoutController.text.trim();
+      String repsDuration = _repsDurationController.text.trim();
 
-    if (day.isNotEmpty && newWorkout.isNotEmpty && repsDuration.isNotEmpty) {
-      setState(() {
-        workoutsByDay[day] ??= [];
-        workoutsByDay[day]!.add({
-          'workout': newWorkout,
-          'repsDuration': repsDuration,
+      if (newWorkout.isNotEmpty && repsDuration.isNotEmpty) {
+        setState(() {
+          workoutsByDay[_selectedDay!] ??= [];
+          workoutsByDay[_selectedDay!]!.add({
+            'workout': newWorkout,
+            'repsDuration': repsDuration,
+          });
+          _workoutController.clear();
+          _repsDurationController.clear();
+          _saveData();
         });
-        _workoutController.clear();
-        _repsDurationController.clear();
-        _dayController.clear();
-        _saveData();
-      });
+      }
     }
   }
 
@@ -93,6 +93,16 @@ class _WorkoutPlannerPageState extends State<WorkoutPlannerPage> {
   @override
   Widget build(BuildContext context) {
     ThemeProvider themeProvider = Provider.of<ThemeProvider>(context);
+
+    List<String> daysOfTheWeek = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
 
     return MaterialApp(
       themeMode: themeProvider.themeMode,
@@ -119,12 +129,23 @@ class _WorkoutPlannerPageState extends State<WorkoutPlannerPage> {
               Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      controller: _dayController,
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedDay,
                       decoration: InputDecoration(
-                        labelText: "Enter Day",
+                        labelText: 'Select Day',
                         border: OutlineInputBorder(),
                       ),
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedDay = newValue;
+                        });
+                      },
+                      items: daysOfTheWeek.map((day) {
+                        return DropdownMenuItem<String>(
+                          value: day,
+                          child: Text(day),
+                        );
+                      }).toList(),
                     ),
                   ),
                   SizedBox(width: 10.0),

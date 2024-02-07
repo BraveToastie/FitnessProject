@@ -15,7 +15,6 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
   String? _selectedMeal;
   String? _customMeal;
   TextEditingController _customMealController = TextEditingController();
-  TextEditingController _dayController = TextEditingController();
 
   final String _key = 'meal_planner_data';
 
