@@ -60,7 +60,10 @@ class _FitnessIntroPageState extends State<FitnessIntroPage> {
       // Navigate to the homepage if login successful
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => Homepage()),
+        MaterialPageRoute(
+            builder: (context) => Homepage(
+                  username: username,
+                )),
       );
     } else {
       // Prompt the user to sign up if login fails

@@ -4,25 +4,40 @@ import 'theme_provider.dart';
 import 'calorietracker.dart';
 import 'mealplanner.dart';
 import 'workoutdiary.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Homepage extends StatefulWidget {
+  final String username;
+
+  Homepage({required this.username});
+
   @override
   _HomepageState createState() => _HomepageState();
 }
 
 class _HomepageState extends State<Homepage> {
   int _currentIndex = 0;
-  int _selectedSteps = 1000; // Default selected steps
-  int _stepsTaken = 0;
+  late List<Widget> _pages;
+  int _totalCaloriesConsumed = 0;
 
-  //Link the other page files to the buttons on the navigator bar
-  //Buttons are assigned to pages in the order of listing here.
-  final List<Widget> _pages = [
-    Center(child: Text("This is the home page")), // Home page content
-    CalorieTrackerPage(),
-    WorkoutPlannerPage(),
-    MealPlannerPage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadTotalCalories();
+    _pages = [
+      _buildHomeContent(), // Home page content
+      CalorieTrackerPage(),
+      WorkoutPlannerPage(),
+      MealPlannerPage(),
+    ];
+  }
+
+  Future<void> _loadTotalCalories() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _totalCaloriesConsumed = prefs.getInt('totalCalories') ?? 0;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +50,7 @@ class _HomepageState extends State<Homepage> {
       home: Scaffold(
         appBar: _currentIndex == 0
             ? AppBar(
-                title: Text("Fitness App - Home Page"),
+                title: Text("Your Fitness Home Page"),
                 backgroundColor: Colors.blue,
                 actions: [
                   IconButton(
@@ -47,18 +62,7 @@ class _HomepageState extends State<Homepage> {
                 ],
               )
             : null,
-        body: Stack(
-          children: [
-            Offstage(
-              offstage: _currentIndex != 0,
-              child: _buildHomeContent(),
-            ),
-            Offstage(
-              offstage: _currentIndex < 1 || _currentIndex >= _pages.length,
-              child: _pages[_currentIndex],
-            ),
-          ],
-        ),
+        body: _pages[_currentIndex],
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _currentIndex,
           type: BottomNavigationBarType.fixed,
@@ -91,61 +95,64 @@ class _HomepageState extends State<Homepage> {
   }
 
   Widget _buildHomeContent() {
-    return Column(
-      children: [
-        _buildStepsDropdown(),
-        SizedBox(height: 16),
-        _buildProgressBar(),
-      ],
-    );
-  }
+    return Consumer<ThemeProvider>(
+      builder: (context, themeProvider, _) {
+        final ThemeData theme = Theme.of(context);
+        final Brightness brightness = theme.brightness;
 
-  Widget _buildStepsDropdown() {
-    List<DropdownMenuItem<int>> items = List.generate(
-      10,
-      (index) => DropdownMenuItem<int>(
-        value: (index + 1) * 1000,
-        child: Text('${(index + 1) * 1000} Steps'),
-      ),
-    );
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          DropdownButton<int>(
-            value: _selectedSteps,
-            onChanged: (value) {
-              setState(() {
-                _selectedSteps = value!;
-              });
-            },
-            items: items,
-          ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _stepsTaken++; // Increment steps taken by 1
-              });
-            },
-            child: Text('+1 Step'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProgressBar() {
-    double progress = _stepsTaken / _selectedSteps;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: LinearProgressIndicator(
-        value: progress,
-        backgroundColor: Colors.grey[300],
-        valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
-      ),
+        return Column(
+          children: [
+            SizedBox(height: 16),
+            Text(
+              'Welcome, ${widget.username}!', // Display the username
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: theme.cardColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Calories eaten today',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: brightness == Brightness.light
+                          ? Colors.black
+                          : Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  FutureBuilder(
+                    future: _loadTotalCalories(),
+                    builder:
+                        (BuildContext context, AsyncSnapshot<void> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return Text(
+                          '$_totalCaloriesConsumed Calories',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: brightness == Brightness.light
+                                ? Colors.black
+                                : Colors.white,
+                          ),
+                        );
+                      } else {
+                        return CircularProgressIndicator();
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

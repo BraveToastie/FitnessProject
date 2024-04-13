@@ -107,7 +107,7 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
       darkTheme: ThemeData.dark(),
       home: Scaffold(
         appBar: AppBar(
-          title: Text("Meal Planner"),
+          title: Text("Meal Diary"),
           backgroundColor: Colors.green,
           actions: [
             IconButton(
