@@ -133,8 +133,10 @@ class _WorkoutPlannerPageState extends State<WorkoutPlannerPage> {
                       value: _selectedDay,
                       decoration: InputDecoration(
                         labelText: 'Select Day',
+                        labelStyle: TextStyle(fontSize: 12),
                         border: OutlineInputBorder(),
                       ),
+                      style: TextStyle(fontSize: 12),
                       onChanged: (newValue) {
                         setState(() {
                           _selectedDay = newValue;
@@ -143,7 +145,7 @@ class _WorkoutPlannerPageState extends State<WorkoutPlannerPage> {
                       items: daysOfTheWeek.map((day) {
                         return DropdownMenuItem<String>(
                           value: day,
-                          child: Text(day),
+                          child: SizedBox(width: 65.0, child: Text(day)),
                         );
                       }).toList(),
                     ),
@@ -152,8 +154,10 @@ class _WorkoutPlannerPageState extends State<WorkoutPlannerPage> {
                   Expanded(
                     child: TextField(
                       controller: _workoutController,
+                      style: TextStyle(fontSize: 12),
                       decoration: InputDecoration(
                         labelText: "Enter Workout",
+                        labelStyle: TextStyle(fontSize: 12),
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -162,8 +166,10 @@ class _WorkoutPlannerPageState extends State<WorkoutPlannerPage> {
                   Expanded(
                     child: TextField(
                       controller: _repsDurationController,
+                      style: TextStyle(fontSize: 12),
                       decoration: InputDecoration(
                         labelText: "Reps/Duration",
+                        labelStyle: TextStyle(fontSize: 12),
                         border: OutlineInputBorder(),
                       ),
                     ),

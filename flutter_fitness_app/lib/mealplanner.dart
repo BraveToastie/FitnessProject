@@ -130,8 +130,10 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
                       value: _selectedDay,
                       decoration: InputDecoration(
                         labelText: 'Select Day',
+                        labelStyle: TextStyle(fontSize: 12),
                         border: OutlineInputBorder(),
                       ),
+                      style: TextStyle(fontSize: 12),
                       onChanged: (newValue) {
                         setState(() {
                           _selectedDay = newValue;
@@ -140,7 +142,7 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
                       items: daysOfTheWeek.map((day) {
                         return DropdownMenuItem<String>(
                           value: day,
-                          child: Text(day),
+                          child: SizedBox(width: 65.0, child: Text(day)),
                         );
                       }).toList(),
                     ),
@@ -151,8 +153,10 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
                       value: _selectedMeal,
                       decoration: InputDecoration(
                         labelText: 'Select Meal',
+                        labelStyle: TextStyle(fontSize: 12),
                         border: OutlineInputBorder(),
                       ),
+                      style: TextStyle(fontSize: 12),
                       onChanged: (newValue) {
                         setState(() {
                           _selectedMeal = newValue;
@@ -161,7 +165,7 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
                       items: mealOptions.map((meal) {
                         return DropdownMenuItem<String>(
                           value: meal,
-                          child: Text(meal),
+                          child: SizedBox(width: 65.0, child: Text(meal)),
                         );
                       }).toList(),
                     ),
@@ -170,6 +174,7 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
                   Expanded(
                     child: TextField(
                       controller: _customMealController,
+                      style: TextStyle(fontSize: 12),
                       onChanged: (value) {
                         setState(() {
                           _customMeal = value.isNotEmpty ? value : null;
@@ -177,6 +182,7 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
                       },
                       decoration: InputDecoration(
                         labelText: 'Meal',
+                        labelStyle: TextStyle(fontSize: 12),
                         border: OutlineInputBorder(),
                       ),
                     ),
@@ -201,9 +207,11 @@ class _MealPlannerPageState extends State<MealPlannerPage> {
 
                     return Card(
                       elevation: 3.0,
-                      margin: EdgeInsets.symmetric(vertical: 10.0),
+                      margin: EdgeInsets.only(bottom: 10.0), // Adjusted margin
                       child: Padding(
-                        padding: const EdgeInsets.all(10.0),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0,
+                            vertical: 8.0), // Adjusted padding
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
